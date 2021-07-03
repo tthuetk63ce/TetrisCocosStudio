@@ -33,7 +33,7 @@ bool GameScene::init() {
     GameScene::tetrisStart();
 
     tetrisAction(_vBlock.at(count));
-    _vSmall.at(_typeBlock % 5)->setPosition(Vec2(98, 165));
+    _vSmall.at(_typeBlock % 6+1)->setPosition(Vec2(98, 165));
     auto backButton = gameScene->getChildByName<ui::Button*>("btn_back");
     backButton->setPressedActionEnabled(true);
     backButton->addClickEventListener([=](Ref*) {
@@ -97,8 +97,9 @@ void GameScene::tetrisStart() {
         _vBlock.at(i)->setPosition(Vec2(414, 1205));
         this->addChild(_vBlock.at(i));
     }
-    for (int i = 0;i <= 5;i++) {
-        _vSmall.push_back((ui::ImageView*)Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(i+1))->clone());
+    _vSmall.push_back((ui::ImageView*)Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(6))->clone());
+    for (int i = 1;i <= 6;i++) {
+        _vSmall.push_back((ui::ImageView*)Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(i))->clone());
         _vSmall.at(i)->setPosition(Vec2(414, 1205));
         this->addChild(_vSmall.at(i));
     }
@@ -140,17 +141,25 @@ void GameScene::changeRightX(ui::Layout* _block, int column) {
 }
 
 void GameScene::update(float dt) {   
-    if ((_vBlock.at(count)->getPositionY() <= 355) 
+    if ((_vBlock.at(count)->getPositionY() <= 655) 
         || (a[_row + 1][_column + 1] == 1 && a[_row + 2][_column + 1] == 10)
         || (a[_row + 1][_column] == 1 && a[_row + 2][_column] == 10)
-        || (a[_row + 1][_column - 1] == 1 && a[_row + 2][_column - 1] == 10))
+        || (a[_row + 1][_column - 1] == 1 && a[_row + 2][_column - 1] == 10)
+        || (a[_row-1][_column-1] == 1 & a[_row][_column-1]==10)
+        )
     {
-        _vSmall.at(_typeBlock % 5)->setPosition(Vec2(414, 1205));
+        _vSmall.at(_typeBlock % 6 +1)->setPosition(Vec2(414, 1205));
+
+
         for (int i = _row - 1;i <= _row + 1;i++)
             for (int j = _column - 1;j <= _column + 1;j++)
-                if (a[i][j] == 1) a[i][j] = 10;  
+                if (a[i][j] == 1) a[i][j] = 10;
+
+
         for (int i = 1;i <= 13;i++)
             for (int j = 1;j <= 12;j++) if (a[i][j] != 0) CCLOG("%d %d %d", i, j, _row);
+        
+        
         _vBlock.at(count)->stopActionByTag(2);
         _row = -4;
         _column = 7;
@@ -158,7 +167,7 @@ void GameScene::update(float dt) {
         count++;
         _typeBlock++;
         tetrisAction(_vBlock.at(count));
-        _vSmall.at(_typeBlock % 5)->setPosition(Vec2(98, 165));
+        _vSmall.at(_typeBlock % 6 + 1)->setPosition(Vec2(98, 165));
     }
               
     //for (int i = 1;i <= 12;i++) if (a[2][i] == 10) isLose = true;
@@ -184,7 +193,7 @@ void GameScene::update(float dt) {
 // Rolation
 void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, int rolation) {
 //O
-    if (blockType == 1) {
+    if (blockType%6 == 1) {
         if (rolation % 1 == 0) {
             a[row][column - 1] = 1;
             a[row][column] = 1;
@@ -198,7 +207,7 @@ void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, in
         }
     }
 //L
-    if (blockType == 2) {
+    if (blockType%6 == 2) {
         if (rolation % 4 == 0) {
             a[row -1][column-1] = 1;
             a[row ][column-1] = 1;
@@ -245,7 +254,7 @@ void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, in
         }
     }
 //J
-    if (blockType == 3) {
+    if (blockType%6 == 3) {
         if (rolation % 4 == 0) {
             a[_row][_column] = 1;
             a[_row - 1][_column] =1;
@@ -280,10 +289,10 @@ void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, in
             if (a[_row + 1][_column + 1] ==1) a[_row + 1][_column + 1] = 0;
         }
         else if (rolation % 4 == 3) {
-            if(a[_row][_column - 1]!=10) a[_row][_column - 1] = 1;
-            if(a[_row][_column] ==1) a[_row][_column] = 1;
-            if(a[_row][_column + 1] ==1) a[_row][_column] = 1;
-            if(a[_row + 1][_column + 1]==1) a[_row][_column] = 1;
+            a[_row][_column] = 1;
+            a[_row][_column-1] = 1;
+            a[_row][_column - +1] = 1;
+            a[_row+1][_column + 1] = 1;
             if (a[_row - 1][_column - 1] ==1) a[_row - 1][_column - 1] = 0;
             if (a[_row - 1][_column] ==1) a[_row - 1][_column] = 0;
             if (a[_row - 1][_column + 1] ==1) a[_row - 1][_column + 1] = 0;
@@ -292,7 +301,7 @@ void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, in
         }
     }
 //Z
-    if (blockType == 5) {
+    if (blockType%6 == 5) {
         if (rolation % 2 == 0) {
             a[_row][_column - 1] = 1;
             a[_row][_column] = 1;
@@ -317,7 +326,7 @@ void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, in
         }
     }
 //T
-    if (blockType == 4) {
+    if (blockType%6 == 4) {
         if (rolation % 4 == 0) {
             a[_row][_column] = 1;
             a[_row + 1][_column - 1] = 1;
@@ -367,7 +376,7 @@ void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, in
         }
     }
 //I
-    if (blockType == 0) {
+    if (blockType%6 == 0) {
         if (rolation % 2 == 0) {
             a[row-1][column] = 1;
             a[row][column] = 1;
@@ -402,7 +411,7 @@ void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, in
 
 void GameScene::rolationBlock(ui::Layout* _block, int _blockType, int rolation) {
 
-    if (_blockType == 1) {
+    if (_blockType%6 == 1) {
         if (rolation % 1 == 0) {
             _block->getChildren().at(0)->setPosition(Vec2(90, 75));
             _block->getChildren().at(1)->setPosition(Vec2(90, 25));
@@ -411,7 +420,7 @@ void GameScene::rolationBlock(ui::Layout* _block, int _blockType, int rolation) 
         }
     }
     //L 
-    if (_blockType == 2) {
+    if (_blockType%6 == 2) {
         if (rolation % 4 == 1) {
             _block->getChildren().at(0)->setPosition(Vec2(30, 25));
             _block->getChildren().at(1)->setPosition(Vec2(30, 75));
@@ -438,7 +447,7 @@ void GameScene::rolationBlock(ui::Layout* _block, int _blockType, int rolation) 
         }
     }
     //Z
-    if (_blockType == 5) {
+    if (_blockType%6 == 5) {
         if (rolation % 2 == 1) {
             _block->getChildren().at(0)->setPosition(Vec2(90, 25));
             _block->getChildren().at(1)->setPosition(Vec2(90, 75));
@@ -453,7 +462,7 @@ void GameScene::rolationBlock(ui::Layout* _block, int _blockType, int rolation) 
         }
     }
     //T
-    if (_blockType == 4) {
+    if (_blockType%6 == 4) {
         if (rolation % 4 == 1) {
             _block->getChildren().at(0)->setPosition(Vec2(30, 25));
             _block->getChildren().at(1)->setPosition(Vec2(30, 75));
@@ -480,7 +489,7 @@ void GameScene::rolationBlock(ui::Layout* _block, int _blockType, int rolation) 
         }
     }
     //J
-    if (_blockType == 3) {
+    if (_blockType%6 == 3) {
         if (rolation % 4 == 1) {
             _block->getChildren().at(0)->setPosition(Vec2(30, 75));
             _block->getChildren().at(1)->setPosition(Vec2(30, 25));
@@ -507,7 +516,7 @@ void GameScene::rolationBlock(ui::Layout* _block, int _blockType, int rolation) 
         }
     }
     //I
-    if (_blockType == 0) {
+    if (_blockType%6 == 0) {
         if (rolation % 2 == 1) {
             _block->getChildren().at(0)->setPosition(Vec2(30, 25));
             _block->getChildren().at(1)->setPosition(Vec2(90, 25));
@@ -528,16 +537,28 @@ void GameScene::tetrisAction(ui::Layout* block) {
         CallFunc::create([=] {
             _row += 1;
             if (_row >= 2) checkArr(a, _typeBlock, _row, _column, _rolation);
-            if (_row >= 3&&_row<=13) {
+            if (_row >= 3 &&_row <=13) {
                 if(a[_row - 2][_column]!=10)a[_row - 2][_column] = 0;
                 if(a[_row - 2][_column - 1]!=10)a[_row - 2][_column-1] = 0;
                 if(a[_row - 2][_column + 1]!=10)a[_row - 2][_column+1] = 0;
             }
+            CCLOG("%d %d %d\n%d %d %d\n%d %d %d",
+                a[_row-1][_column-1],
+                a[_row-1][_column],
+                a[_row-1][_column+1],
+                a[_row][_column-1],
+                a[_row][_column],
+                a[_row][_column+1],
+                a[_row+1][_column-1],
+                a[_row+1][_column],
+                a[_row+1][_column+1]
+            );
             }),
         nullptr
     );
     auto rSeq = RepeatForever::create(seq);
     rSeq->setTag(2);
+    seq->setTag(1);
     block->runAction(rSeq);
 
     ActionTimeline* animTimeline = CSLoader::createTimeline("csb/bg_play_scene.csb");
