@@ -33,10 +33,7 @@ bool GameScene::init() {
     GameScene::tetrisStart();
 
     tetrisAction(_vBlock.at(count));
-
-
-
-
+    _vSmall.at(_typeBlock % 5)->setPosition(Vec2(98, 165));
     auto backButton = gameScene->getChildByName<ui::Button*>("btn_back");
     backButton->setPressedActionEnabled(true);
     backButton->addClickEventListener([=](Ref*) {
@@ -52,183 +49,33 @@ bool GameScene::init() {
 	return true;
 }
 
-void GameScene::tetrisdoBorn(ui::ImageView* _Small,ui::Layout* block) {
+void GameScene::tetrisdoBorn(ui::ImageView* _Small) {
         srand(time(NULL));
         switch (rand() % 6)
         {
         case 0:
             _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(1));
-            switch (rand()%6)
-            {
-            case 0:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_o_0")->clone();
-                break;
-            case 1:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_o_1")->clone();
-                break;
-            case 2:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_o_2")->clone();
-                break;
-            case 3:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_o_3")->clone();
-                break;
-            case 4:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_o_4")->clone();
-                break;
-            case 5:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_o_5")->clone();
-                break;
-            default:
-                break;
-            }
-            _blockType = 1;
-            block->setPosition(Vec2(382, 1030));
-            this->addChild(block);
+            _typeBlock = 1;
             break;
         case 1:
             _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(2));
-            switch (rand() % 6)
-            {
-            case 0:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_l_0")->clone();
-                break;
-            case 1:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_l_1")->clone();
-                break;
-            case 2:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_l_2")->clone();
-                break;
-            case 3:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_l_3")->clone();
-                break;
-            case 4:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_l_4")->clone();
-                break;
-            case 5:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_l_5")->clone();
-                break;
-            default:
-                break;
-            }
-            _blockType = 2;
-            block->setPosition(Vec2(382, 1055));
-            this->addChild(block);
+            _typeBlock = 2;
             break;
         case 2:
             _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(3));
-            switch (rand() % 6)
-            {
-            case 0:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_j_0")->clone();
-                break;
-            case 1:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_j_1")->clone();
-                break;
-            case 2:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_j_2")->clone();
-                break;
-            case 3:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_j_3")->clone();
-                break;
-            case 4:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_j_4")->clone();
-                break;
-            case 5:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_j_5")->clone();
-                break;
-            default:
-                break;
-            }
-            _blockType = 3;
-            block->setPosition(Vec2(382, 1055));
-            this->addChild(block);
+            _typeBlock = 3;
             break;
         case 3:
             _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(4));
-            switch (rand() % 6)
-            {
-            case 0:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_t_0")->clone();
-                break;
-            case 1:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_t_1")->clone();
-                break;
-            case 2:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_t_2")->clone();
-                break;
-            case 3:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_t_3")->clone();
-                break;
-            case 4:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_t_4")->clone();
-                break;
-            case 5:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_t_5")->clone();
-                break;
-            default:
-                break;
-            }
-            _blockType = 4;
-            block->setPosition(Vec2(354, 1030));
-            this->addChild(block);
+            _typeBlock = 4;
             break;
         case 4:
             _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(5));
-            switch (rand() % 6)
-            {
-            case 0:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_z_0")->clone();
-                break;
-            case 1:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_z_1")->clone();
-                break;
-            case 2:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_z_2")->clone();
-                break;
-            case 3:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_z_3")->clone();
-                break;
-            case 4:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_z_4")->clone();
-                break;
-            case 5:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_z_5")->clone();
-                break;
-            default:
-                break;
-            }
-            _blockType = 5;
-            block->setPosition(Vec2(354, 1030));
-            this->addChild(block);
+            _typeBlock = 5;
             break;
         case 5:
             _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(6));
-            switch (rand() % 6)
-            {
-            case 0:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_i_0")->clone();
-                break;
-            case 1:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_i_1")->clone();
-                break;
-            case 2:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_i_2")->clone();
-                break;
-            case 3:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_i_3")->clone();
-                break;
-            case 4:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_i_4")->clone();
-                break;
-            case 5:
-                block = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_i_5")->clone();
-                break;
-            default:
-                break;
-            }
-            _blockType = 6;
-            block->setPosition(Vec2(412, 1055));
-            this->addChild(block);
+            _typeBlock = 6;
             break;
         default:
             break;
@@ -239,7 +86,7 @@ void GameScene::tetrisdoBorn(ui::ImageView* _Small,ui::Layout* block) {
     }
 
 void GameScene::tetrisStart() {
-    for (int i = 0;i <= 100;i++)
+    for (int i = 0;i <= 1000;i++)
     {
         if (i % 6 == 0)_vBlock.push_back((ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_i_0")->clone());
         if (i % 6 == 1)_vBlock.push_back((ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_o_0")->clone());
@@ -249,6 +96,11 @@ void GameScene::tetrisStart() {
         if (i % 6 == 5)_vBlock.push_back((ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_z_0")->clone());
         _vBlock.at(i)->setPosition(Vec2(414, 1205));
         this->addChild(_vBlock.at(i));
+    }
+    for (int i = 0;i <= 5;i++) {
+        _vSmall.push_back((ui::ImageView*)Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(i+1))->clone());
+        _vSmall.at(i)->setPosition(Vec2(414, 1205));
+        this->addChild(_vSmall.at(i));
     }
 }
 
@@ -287,13 +139,13 @@ void GameScene::changeRightX(ui::Layout* _block, int column) {
 
 }
 
-void GameScene::update(float dt) {
-    /*if (!isStop) {*/    
+void GameScene::update(float dt) {   
     if ((_vBlock.at(count)->getPositionY() <= 355) 
         || (a[_row + 1][_column + 1] == 1 && a[_row + 2][_column + 1] == 10)
         || (a[_row + 1][_column] == 1 && a[_row + 2][_column] == 10)
         || (a[_row + 1][_column - 1] == 1 && a[_row + 2][_column - 1] == 10))
     {
+        _vSmall.at(_typeBlock % 5)->setPosition(Vec2(414, 1205));
         for (int i = _row - 1;i <= _row + 1;i++)
             for (int j = _column - 1;j <= _column + 1;j++)
                 if (a[i][j] == 1) a[i][j] = 10;  
@@ -304,21 +156,27 @@ void GameScene::update(float dt) {
         _column = 7;
         _rolation = 0;
         count++;
-        _typeBlock = (_typeBlock++) % 6;
+        _typeBlock++;
         tetrisAction(_vBlock.at(count));
+        _vSmall.at(_typeBlock % 5)->setPosition(Vec2(98, 165));
     }
               
-    /*}*/
     //for (int i = 1;i <= 12;i++) if (a[2][i] == 10) isLose = true;
     //if (!isLose){
-    //    for (int j = 1;j <= 11;j++)
-    //    if ((a[13][j] != a[13][j + 1]) && (a[13][j] != 0)) {
+    //    for (int i = 12;i>=1;i--)
+    //      for (int j = 1;j <= 11;j++)
+    //          if ((a[i][j] != a[i][j + 1]) && (a[i][j] != 0)) {
     //            isScore = false; break;
-    //        }
+    //          }
     //    if (isScore) {
     //        Score++;
     //        // _vBlock(at(i)) setPosition(-50);
     //        // a[i+1][j] = a[i][j]
+    //          for(auto it = _vBlock.begin(); it != _vBlock.end(); ++it) 
+    //              {
+    //                  _v.Block.at(it) -> removeChild();
+    // }
+    // }
     //    }
     //}
 }
@@ -662,6 +520,7 @@ void GameScene::rolationBlock(ui::Layout* _block, int _blockType, int rolation) 
         }
     }
 }
+
 void GameScene::tetrisAction(ui::Layout* block) {
     auto seq = Sequence::create(
         MoveBy::create(0.5f, Point(0, -50)),
@@ -684,7 +543,6 @@ void GameScene::tetrisAction(ui::Layout* block) {
     ActionTimeline* animTimeline = CSLoader::createTimeline("csb/bg_play_scene.csb");
     animTimeline->setTimeSpeed(0.5f);
     animTimeline->gotoFrameAndPlay(0);
-
 
     auto rolationBtn = gameScene->getChildByName<ui::Button*>("btn_rolation");
     rolationBtn->setPressedActionEnabled(true);
@@ -713,7 +571,6 @@ void GameScene::tetrisAction(ui::Layout* block) {
             changeLeftX(block, _column);
         }
     });
-
     auto rightBtn = gameScene->getChildByName<ui::Button*>("btn_right");
     rightBtn->setPressedActionEnabled(true);
     rightBtn->addClickEventListener([=](Ref*) {
@@ -730,3 +587,4 @@ void GameScene::tetrisAction(ui::Layout* block) {
         }
     });
 }
+

@@ -24,6 +24,7 @@ public:
                       {0,0,0,0,0,0,0,0,0,0,0,0,0},
     };
     std::vector <ui::Layout*> _vBlock;
+    std::vector <ui::ImageView*> _vSmall;
     bool isRemove = false;
     bool isPlay = false;
     bool isBorn = true;
@@ -33,7 +34,6 @@ public:
     int count = 1;
     int _row = -4, _column = 7, _rolation = 0, _typeBlock = 1;
     bool isMoving = false;
-    int _blockType;
 
     static cocos2d::Scene* createScene();
 
@@ -46,12 +46,12 @@ public:
     CREATE_FUNC(GameScene);
     Node* Imagesave = CSLoader::getInstance()->createNode("csb/ImageSave.csb");
     Node* gameScene = CSLoader::getInstance()->createNode("csb/bg_play_scene.csb");
-
+    ui::ImageView* _Small;
     void tetrisAction(ui::Layout* block);
 
     void tetrisdoDraw();
 
-    void tetrisdoBorn(ui::ImageView* Small, ui::Layout* block);
+    void tetrisdoBorn(ui::ImageView* Small);
     void rolationBlock(ui::Layout* _block, int _blockType, int rolation);
     void changeLeftX(ui::Layout* _block, int column);
     void changeRightX(ui::Layout* _block, int column);
