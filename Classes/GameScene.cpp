@@ -6,6 +6,7 @@
 #include <string> 
 #include <iostream>
 #include <vector>
+#include "GameOver.h"
 
 
 USING_NS_CC;
@@ -29,11 +30,16 @@ bool GameScene::init() {
 	this->addChild(gameScene);
     Imagesave->retain();
     tetrisdoDraw();
-
+    srand(time(NULL));
+    _typeBlock = rand() % 6 + 1;
     GameScene::tetrisStart();
+   
 
-    tetrisAction(_vBlock.at(count));
-    _vSmall.at(_typeBlock % 6+1)->setPosition(Vec2(98, 165));
+
+    tetrisAction(_tblock);
+  /*  tetrisAction(_vBlock.at(count));*/
+
+
     auto backButton = gameScene->getChildByName<ui::Button*>("btn_back");
     backButton->setPressedActionEnabled(true);
     backButton->addClickEventListener([=](Ref*) {
@@ -49,60 +55,14 @@ bool GameScene::init() {
 	return true;
 }
 
-void GameScene::tetrisdoBorn(ui::ImageView* _Small) {
-        srand(time(NULL));
-        switch (rand() % 6)
-        {
-        case 0:
-            _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(1));
-            _typeBlock = 1;
-            break;
-        case 1:
-            _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(2));
-            _typeBlock = 2;
-            break;
-        case 2:
-            _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(3));
-            _typeBlock = 3;
-            break;
-        case 3:
-            _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(4));
-            _typeBlock = 4;
-            break;
-        case 4:
-            _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(5));
-            _typeBlock = 5;
-            break;
-        case 5:
-            _Small = Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(6));
-            _typeBlock = 6;
-            break;
-        default:
-            break;
-        }
-        _Small->setPosition(Vec2(98, 165));
-        _Small->removeFromParentAndCleanup(false);
-        this->addChild(_Small);
-    }
-
 void GameScene::tetrisStart() {
-    for (int i = 0;i <= 1000;i++)
-    {
-        if (i % 6 == 0)_vBlock.push_back((ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_i_0")->clone());
-        if (i % 6 == 1)_vBlock.push_back((ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_o_0")->clone());
-        if (i % 6 == 2)_vBlock.push_back((ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_l_0")->clone());
-        if (i % 6 == 3)_vBlock.push_back((ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_j_0")->clone());
-        if (i % 6 == 4)_vBlock.push_back((ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_t_0")->clone());
-        if (i % 6 == 5)_vBlock.push_back((ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_z_0")->clone());
-        _vBlock.at(i)->setPosition(Vec2(414, 1205));
-        this->addChild(_vBlock.at(i));
-    }
-    _vSmall.push_back((ui::ImageView*)Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(6))->clone());
-    for (int i = 1;i <= 6;i++) {
-        _vSmall.push_back((ui::ImageView*)Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(i))->clone());
-        _vSmall.at(i)->setPosition(Vec2(414, 1205));
-        this->addChild(_vSmall.at(i));
-    }
+    _tblock = (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_t_0")->clone();
+    _tblock->setPosition(Vec2(Vec2(414, 1205)));
+    this->addChild(_tblock);
+
+    _tBlock = (ui::ImageView*)Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(_typeBlock))->clone();
+    _tBlock->setPosition(Vec2(95, 165));
+    this->addChild(_tBlock);
 }
 
 void GameScene::tetrisdoDraw() {
@@ -127,71 +87,115 @@ void GameScene::tetrisdoDraw() {
         }
     }
     
+void GameScene::changeLeftX(ui::Layout* _block) {
     
-void GameScene::changeLeftX(ui::Layout* _block, int column) {
-    
-     _block->runAction(MoveBy::create(0.5f, Point(-60, 0))); 
+     _block->runAction(MoveBy::create(0.25f, Point(-60, 0))); 
 
 }
 
-void GameScene::changeRightX(ui::Layout* _block, int column) {
+void GameScene::changeRightX(ui::Layout* _block) {
 
-    _block->runAction(MoveBy::create(0.5f, Point(60, 0)));
+    _block->runAction(MoveBy::create(0.25f, Point(60, 0)));
 
 }
 
-void GameScene::update(float dt) {   
-    if ((_vBlock.at(count)->getPositionY() <= 655) 
+void GameScene::update(float dt) {
+    score->setString(to_string(_Score));
+    if ((_tblock->getPositionY() <= 355) 
         || (a[_row + 1][_column + 1] == 1 && a[_row + 2][_column + 1] == 10)
         || (a[_row + 1][_column] == 1 && a[_row + 2][_column] == 10)
         || (a[_row + 1][_column - 1] == 1 && a[_row + 2][_column - 1] == 10)
-        || (a[_row-1][_column-1] == 1 & a[_row][_column-1]==10)
+        || (a[_row-1][_column-1] == 1 && a[_row][_column-1]==10)
+        || (a[_row - 1][_column + 1] == 1 && a[_row][_column + 1] == 10)
+        || (a[_row][_column -1] == 1 && a[_row+1][_column - 1] == 10)
+        || (a[_row][_column + 1] == 1 && a[_row+1][_column + 1] == 10)
+        || (a[_row][_column]==1 && a[_row+1][_column]==10)
         )
     {
-        _vSmall.at(_typeBlock % 6 +1)->setPosition(Vec2(414, 1205));
-
 
         for (int i = _row - 1;i <= _row + 1;i++)
             for (int j = _column - 1;j <= _column + 1;j++)
-                if (a[i][j] == 1) a[i][j] = 10;
+                if (a[i][j] == 1)
+                {
+                    a[i][j] = 10;
+                    _vblock.push_back((ui::ImageView*)static_cast<ui::ImageView*>(_tblock->getChildren().at(0))->clone());
+                    _vblock.at(_index)->setPosition(Vec2(60*j-6,305+50*(14-i)));
+                    this->addChild(_vblock.at(_index));
+                    _index++;
+                }
+        for (int i = 1;i <= 12;i++) if (a[1][i] == 10 || a[2][i] == 10) {
+            isLose = true;
+            break;
+        }
+        if (!isLose) {
+            score->setString(to_string(_score / 11));
+            for (int i = 14;i >= 2;i--)
+                for (int j = 1;j <= 11;j++)
+                    if ((a[i][j] == a[i][j + 1]) && (a[i][j] == 10)) {
+                        _score++;
+                        
+                        if (_score % 11 == 0)
+                        {
+                            _Score++;
+                            isScore = true;
+                        }
+                        if (isScore) {
+                            for (int ii = 0;ii <= _vblock.size() - 1;ii++) {
+                                if (this->_vblock.at(ii)!=nullptr) {
+                                    if (_vblock.at(ii)->getPositionY() == 305 + 50 * (14 - i)) {
+                                        this->removeChild(_vblock.at(ii));
+                                        _vblock.at(ii) = nullptr;
+                                    }
+                                    else if(_vblock.at(ii)->getPositionY() >= 305 + 50 * (15 - i))
+                                        _vblock.at(ii)
+                                        ->setPosition(_vblock.at(ii)->getPosition() + Vec2(0, -50));
+                                }
+                            }
+                            for (int k = i;k >= 2;k--)
+                                for (int j = 1;j <= 12;j++)
+                                    a[k][j] = a[k - 1][j];
+                            isScore = false;                          
+                            break;
+                        }
+
+                    }
+                    else { _score = 0; break; }
+        }
+        else {
+            auto scene = GameOver::createScene();
+            Director::getInstance()->replaceScene(TransitionFade::create(1.0f, scene));
+        }
 
 
-        for (int i = 1;i <= 13;i++)
-            for (int j = 1;j <= 12;j++) if (a[i][j] != 0) CCLOG("%d %d %d", i, j, _row);
-        
-        
-        _vBlock.at(count)->stopActionByTag(2);
+        _tblock->stopActionByTag(2);
+        this->removeChild(_tBlock);
+        this->removeChild(_tblock);
+   
+        for (int i = 1;i <= 14;i++)
+            for (int j = 1;j <= 13;j++) if (a[i][j] == 10) CCLOG("%d %d %d", i, j, a[i][j]); 
+
         _row = -4;
         _column = 7;
         _rolation = 0;
-        count++;
-        _typeBlock++;
-        tetrisAction(_vBlock.at(count));
-        _vSmall.at(_typeBlock % 6 + 1)->setPosition(Vec2(98, 165));
+        isScore = false;
+
+        _tblock = tetrisBorn(_typeBlock);
+        _tblock->setPosition(Vec2(414, 1205));
+        this->addChild(_tblock);
+        tetrisAction(_tblock);
+
+        srand(time(NULL));
+        _typeBlock = rand() % 6 +1;
+        _tBlock = (ui::ImageView*)Imagesave->getChildByName<ui::ImageView*>("small_" + to_string(_typeBlock))->clone();
+        _tBlock->setPosition(Vec2(98, 165));
+        this->addChild(_tBlock);
     }
-              
-    //for (int i = 1;i <= 12;i++) if (a[2][i] == 10) isLose = true;
-    //if (!isLose){
-    //    for (int i = 12;i>=1;i--)
-    //      for (int j = 1;j <= 11;j++)
-    //          if ((a[i][j] != a[i][j + 1]) && (a[i][j] != 0)) {
-    //            isScore = false; break;
-    //          }
-    //    if (isScore) {
-    //        Score++;
-    //        // _vBlock(at(i)) setPosition(-50);
-    //        // a[i+1][j] = a[i][j]
-    //          for(auto it = _vBlock.begin(); it != _vBlock.end(); ++it) 
-    //              {
-    //                  _v.Block.at(it) -> removeChild();
-    // }
-    // }
-    //    }
-    //}
+    
+    
 }
 
 // Rolation
-void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, int rolation) {
+void GameScene::checkArr(int arr[15][13], int blockType, int row, int column, int rolation) {
 //O
     if (blockType%6 == 1) {
         if (rolation % 1 == 0) {
@@ -303,31 +307,31 @@ void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, in
 //Z
     if (blockType%6 == 5) {
         if (rolation % 2 == 0) {
-            a[_row][_column - 1] = 1;
-            a[_row][_column] = 1;
-            a[_row + 1][_column] = 1;
-            a[_row + 1][_column + 1] = 1;
+            a[_row+1][_column - 1] = 1;
+            a[_row][_column-1] = 1;
+            a[_row ][_column] = 1;
+            a[_row-1][_column] = 1;
             if (a[_row - 1][_column - 1] ==1) a[_row - 1][_column - 1] = 0;
-            if (a[_row - 1][_column] ==1) a[_row - 1][_column] = 0;
-            if (a[_row - 1][_column + 1] ==1) a[_row - 1][_column + 1] = 0;
-            if (a[_row][_column + 1] ==1) a[_row][_column + 1] = 0;
-            if (a[_row + 1][_column - 1] ==1) a[_row + 1][_column - 1] = 0;
+            if (a[_row - 1][_column+1] ==1) a[_row - 1][_column+1] = 0;
+            if (a[_row ][_column + 1] ==1) a[_row ][_column + 1] = 0;
+            if (a[_row+1][_column ] ==1) a[_row+1][_column] = 0;
+            if (a[_row + 1][_column + 1] ==1) a[_row + 1][_column + 1] = 0;
         }
         else if (rolation % 2 == 1) {
             a[_row][_column] = 1;
-            a[_row][_column + 1] = 1;;
-            a[_row - 1][_column + 1] = 1;
+            a[_row][_column - 1] = 1;;
+            a[_row + 1][_column + 1] = 1;
             a[_row + 1][_column] = 1;
             if (a[_row - 1][_column - 1] ==1) a[_row - 1][_column - 1] = 0;
             if (a[_row - 1][_column] ==1) a[_row - 1][_column] = 0;
-            if (a[_row][_column - 1] ==1) a[_row][_column - 1] = 0;
+            if (a[_row - 1][_column+1] == 1) a[_row - 1][_column+1] = 0;
+            if (a[_row][_column + 1] ==1) a[_row][_column + 1] = 0;
             if (a[_row + 1][_column - 1] ==1) a[_row + 1][_column - 1] = 0;
-            if (a[_row + 1][_column + 1] ==1) a[_row + 1][_column + 1] = 0;
         }
     }
 //T
     if (blockType%6 == 4) {
-        if (rolation % 4 == 0) {
+        if (rolation % 4 == 3) {
             a[_row][_column] = 1;
             a[_row + 1][_column - 1] = 1;
             a[_row + 1][_column] = 1;
@@ -338,7 +342,7 @@ void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, in
             if (a[_row][_column-1] ==1) a[_row][_column-1] = 0;
             if (a[_row][_column + 1] ==1) a[_row][_column + 1] = 0;
         }
-        else if (rolation % 4 == 1) {
+        else if (rolation % 4 == 0) {
 
             a[_row][_column - 1] = 1;
             a[_row][_column] = 1;
@@ -350,7 +354,7 @@ void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, in
             if (a[_row + 1][_column] ==1) a[_row + 1][_column] = 0;
             if (a[_row + 1][_column + 1] ==1) a[_row + 1][_column + 1] = 0;
         }
-        else if (rolation % 4 == 2) {
+        else if (rolation % 4 == 1) {
 
             a[_row][_column - 1] = 1;
             a[_row][_column] = 1;
@@ -362,17 +366,17 @@ void GameScene::checkArr(int arr[14][13], int blockType, int row, int column, in
             if (a[_row + 1][_column - 1] ==1) a[_row + 1][_column - 1] = 0;
             if (a[_row + 1][_column + 1] ==1) a[_row + 1][_column + 1] = 0;
         }
-        else if (rolation % 4 == 3) {
+        else if (rolation % 4 == 2) {
 
-            a[_row][_column] = 1;
-            a[_row][_column + 1] = 1;
-            a[_row - 1][_column + 1] = 1;
-            a[_row + 1][_column + 1] = 1;
+            a[_row-1][_column] = 1;
+            a[_row][_column ] = 1;
+            a[_row ][_column-1] = 1;
+            a[_row + 1][_column] = 1;
             if (a[_row - 1][_column - 1] ==1) a[_row - 1][_column - 1] = 0;
-            if (a[_row - 1][_column] ==1) a[_row - 1][_column] = 0;
-            if (a[_row][_column - 1] ==1) a[_row][_column - 1] = 0;
+            if (a[_row - 1][_column+1] ==1) a[_row - 1][_column+1] = 0;
+            if (a[_row][_column + 1] ==1) a[_row][_column + 1] = 0;
             if (a[_row + 1][_column - 1] ==1) a[_row + 1][_column - 1] = 0;
-            if (a[_row + 1][_column] ==1) a[_row + 1][_column] = 0;
+            if (a[_row + 1][_column+1] ==1) a[_row + 1][_column+1] = 0;
         }
     }
 //I
@@ -449,42 +453,42 @@ void GameScene::rolationBlock(ui::Layout* _block, int _blockType, int rolation) 
     //Z
     if (_blockType%6 == 5) {
         if (rolation % 2 == 1) {
-            _block->getChildren().at(0)->setPosition(Vec2(90, 25));
+            _block->getChildren().at(0)->setPosition(Vec2(30, 75));
             _block->getChildren().at(1)->setPosition(Vec2(90, 75));
-            _block->getChildren().at(2)->setPosition(Vec2(150, 75));
-            _block->getChildren().at(3)->setPosition(Vec2(150, 125));
+            _block->getChildren().at(2)->setPosition(Vec2(90, 25));
+            _block->getChildren().at(3)->setPosition(Vec2(150, 25));
         }
         else if (rolation % 2 == 0) {
-            _block->getChildren().at(0)->setPosition(Vec2(150, 25));
-            _block->getChildren().at(1)->setPosition(Vec2(90, 25));
+            _block->getChildren().at(0)->setPosition(Vec2(30, 25));
+            _block->getChildren().at(1)->setPosition(Vec2(30, 75));
             _block->getChildren().at(2)->setPosition(Vec2(90, 75));
-            _block->getChildren().at(3)->setPosition(Vec2(30, 75));
+            _block->getChildren().at(3)->setPosition(Vec2(90, 125));
         }
     }
     //T
     if (_blockType%6 == 4) {
         if (rolation % 4 == 1) {
-            _block->getChildren().at(0)->setPosition(Vec2(30, 25));
-            _block->getChildren().at(1)->setPosition(Vec2(30, 75));
-            _block->getChildren().at(2)->setPosition(Vec2(30, 125));
-            _block->getChildren().at(3)->setPosition(Vec2(90, 75));
-        }
-        else if (rolation % 4 == 2) {
             _block->getChildren().at(0)->setPosition(Vec2(30, 75));
             _block->getChildren().at(1)->setPosition(Vec2(90, 75));
             _block->getChildren().at(2)->setPosition(Vec2(150, 75));
             _block->getChildren().at(3)->setPosition(Vec2(90, 25));
         }
-        else if (rolation % 4 == 3) {
-            _block->getChildren().at(0)->setPosition(Vec2(150, 125));
-            _block->getChildren().at(1)->setPosition(Vec2(150, 75));
-            _block->getChildren().at(2)->setPosition(Vec2(150, 25));
-            _block->getChildren().at(3)->setPosition(Vec2(90, 75));
+        else if (rolation % 4 == 2) {
+            _block->getChildren().at(0)->setPosition(Vec2(90, 125));
+            _block->getChildren().at(1)->setPosition(Vec2(90, 75));
+            _block->getChildren().at(2)->setPosition(Vec2(90, 25));
+            _block->getChildren().at(3)->setPosition(Vec2(30, 75));
         }
-        else if (rolation % 4 == 0) {
+        else if (rolation % 4 == 3) {
             _block->getChildren().at(0)->setPosition(Vec2(150, 25));
             _block->getChildren().at(1)->setPosition(Vec2(90, 25));
             _block->getChildren().at(2)->setPosition(Vec2(30, 25));
+            _block->getChildren().at(3)->setPosition(Vec2(90, 75));
+        }
+        else if (rolation % 4 == 0) {
+            _block->getChildren().at(0)->setPosition(Vec2(30, 25));
+            _block->getChildren().at(1)->setPosition(Vec2(30, 75));
+            _block->getChildren().at(2)->setPosition(Vec2(30, 125));
             _block->getChildren().at(3)->setPosition(Vec2(90, 75));
         }
     }
@@ -509,10 +513,10 @@ void GameScene::rolationBlock(ui::Layout* _block, int _blockType, int rolation) 
             _block->getChildren().at(3)->setPosition(Vec2(30, 75));
         }
         else if (rolation % 4 == 0) {
-            _block->getChildren().at(0)->setPosition(Vec2(90, 25));
-            _block->getChildren().at(1)->setPosition(Vec2(150, 25));
-            _block->getChildren().at(2)->setPosition(Vec2(150, 75));
-            _block->getChildren().at(3)->setPosition(Vec2(150, 125));
+            _block->getChildren().at(0)->setPosition(Vec2(30, 25));
+            _block->getChildren().at(1)->setPosition(Vec2(90, 25));
+            _block->getChildren().at(2)->setPosition(Vec2(90, 75));
+            _block->getChildren().at(3)->setPosition(Vec2(90, 125));
         }
     }
     //I
@@ -531,31 +535,35 @@ void GameScene::rolationBlock(ui::Layout* _block, int _blockType, int rolation) 
 }
 
 void GameScene::tetrisAction(ui::Layout* block) {
+    int indexL = 0, indexR = 0;
+    if (a[_row - 1][_column + 1] == 0 && a[_row][_column + 1] == 0 && a[_row + 1][_column + 1] == 0)
+        indexR = 11;
+    else indexR = 10;
     auto seq = Sequence::create(
-        MoveBy::create(0.5f, Point(0, -50)),
-        DelayTime::create(0.5f),
+        MoveBy::create(0.25f, Point(0, -50)),
         CallFunc::create([=] {
             _row += 1;
-            if (_row >= 2) checkArr(a, _typeBlock, _row, _column, _rolation);
-            if (_row >= 3 &&_row <=13) {
-                if(a[_row - 2][_column]!=10)a[_row - 2][_column] = 0;
-                if(a[_row - 2][_column - 1]!=10)a[_row - 2][_column-1] = 0;
-                if(a[_row - 2][_column + 1]!=10)a[_row - 2][_column+1] = 0;
+            if (_row >= 2) checkArr(a, type_Block, _row, _column, _rolation);
+            if (_row >= 3 && _row <= 13) {
+                if (a[_row - 2][_column] != 10)a[_row - 2][_column] = 0;
+                if (a[_row - 2][_column - 1] != 10)a[_row - 2][_column - 1] = 0;
+                if (a[_row - 2][_column + 1] != 10)a[_row - 2][_column + 1] = 0;
             }
             CCLOG("%d %d %d\n%d %d %d\n%d %d %d",
-                a[_row-1][_column-1],
-                a[_row-1][_column],
-                a[_row-1][_column+1],
-                a[_row][_column-1],
+                a[_row - 1][_column - 1],
+                a[_row - 1][_column],
+                a[_row - 1][_column + 1],
+                a[_row][_column - 1],
                 a[_row][_column],
-                a[_row][_column+1],
-                a[_row+1][_column-1],
-                a[_row+1][_column],
-                a[_row+1][_column+1]
+                a[_row][_column + 1],
+                a[_row + 1][_column - 1],
+                a[_row + 1][_column],
+                a[_row + 1][_column + 1]
             );
             }),
+        DelayTime::create(0.25f),
         nullptr
-    );
+                );
     auto rSeq = RepeatForever::create(seq);
     rSeq->setTag(2);
     seq->setTag(1);
@@ -568,44 +576,210 @@ void GameScene::tetrisAction(ui::Layout* block) {
     auto rolationBtn = gameScene->getChildByName<ui::Button*>("btn_rolation");
     rolationBtn->setPressedActionEnabled(true);
     rolationBtn->addClickEventListener([=](Ref*) {
-        if (_column >= 2 && _row >= 2) {
+        if (_column >= 2 && _row >= 2 && _column<=11
+            &&a[_row-1][_column-1] !=10 &&a[_row-1][_column]!=10 &&a[_row-1][_column+1]!=10
+            && a[_row][_column - 1] != 10 && a[_row][_column] != 10 && a[_row][_column + 1] != 10
+            && a[_row + 1][_column - 1] != 10 && a[_row + 1][_column] != 10 && a[_row + 1][_column + 1] != 10
+            ) {
             _rolation++;
             CCLOG("%d", _rolation);
-            checkArr(a, _typeBlock, _row, _column, _rolation);
-            rolationBlock(block, _typeBlock, _rolation);
+            checkArr(a, type_Block, _row, _column, _rolation);
+            rolationBlock(block, type_Block, _rolation);
         }
-    });
+        });
     auto leftBtn = gameScene->getChildByName<ui::Button*>("btn_left");
     leftBtn->setPressedActionEnabled(true);
-    leftBtn->addClickEventListener([=](Ref*) {  
-        if (_column >= 3 && _row >= 2 
-            && a[_row][_column-2] ==0 
-            && a[_row-1][_column-2] == 0 
-            && a[_row+1][_column-2] == 0
-            )
-        {
-            _column -= 1;
-            CCLOG("%d", _column);
-            a[_row - 1][_column + 2] = 0;
-            a[_row][_column + 2] = 0;
-             a[_row + 1][_column + 2] = 0;
-            changeLeftX(block, _column);
-        }
-    });
+    leftBtn->addClickEventListener([=](Ref*) {
+        if (_row >= 2) {
+            if (block->getChildren().size() == 3)
+                if (_column >= 2 && a[_row - 1][_column - 1] == 0 && a[_row][_column - 1] == 0 && a[_row + 1][_column - 1] ==0 ) {
+                    _column -= 1;
+                    CCLOG("%d", _column);
+                    a[_row - 1][_column + 2] = 0;
+                    a[_row][_column + 2] = 0;
+                    a[_row + 1][_column + 2] = 0;
+                    changeLeftX(block);
+                }
+            if (block->getChildren().size() == 4 && _column>=3)
+                /*if (    (a[_row-1][_column-1] == 1 && a[_row-1][_column-2]!=10
+                        && a[_row][_column-1] == 1 && a[_row][_column - 2] != 10
+                        && a[_row+1][_column - 1] == 1 && a[_row+1][_column - 2] !=10)
+                    ||
+                      (
+                       a[_row + 1][_column - 1] == 1 && a[_row + 1][_column - 2] != 10
+                       && a[_row][_column - 1] == 1 && a[_row][_column - 2] != 10                          
+                      )
+                    ||
+                    (
+                        a[_row + 1][_column] == 1 && a[_row + 1][_column - 1] != 10
+                        && a[_row][_column] == 1 && a[_row][_column - 1] != 10
+                        )
+                    ||
+                    (a[_row][_column] == 1 && a[_row ][_column - 1] != 10
+                        && a[_row-1][_column - 1] == 1 && a[_row-1][_column - 2] != 10
+                        )
+                    ||
+                    (a[_row][_column] == 1 && a[_row][_column - 1] != 10
+                        && a[_row + 1][_column - 1] == 1 && a[_row + 1][_column - 2] != 10
+                        )
+                    )*/
+                if (a[_row-1][_column-2] !=10  && a[_row][_column-2]!=10 && a[_row+1][_column-2]!=10)
+            {
+                _column -= 1;
+                CCLOG("%d", _column);
+                a[_row - 1][_column + 2] = 0;
+                a[_row][_column + 2] = 0;
+                a[_row + 1][_column + 2] = 0;
+                changeLeftX(block);
+            }
+        }});
     auto rightBtn = gameScene->getChildByName<ui::Button*>("btn_right");
     rightBtn->setPressedActionEnabled(true);
     rightBtn->addClickEventListener([=](Ref*) {
-        if (_column <= 11 && _row >= 2 
-            && a[_row][_column + 2] == 0
-            && a[_row - 1][_column + 2] == 0
-            && a[_row + 1][_column + 2] == 0) {
-            changeRightX(block, _column);
-            _column += 1;
-            CCLOG("%d", _column);
-            a[_row - 1][_column - 2] = 0;
-            a[_row][_column - 2] = 0;
-            a[_row + 1][_column - 2] = 0;
-        }
+        if (_row >= 2) {
+            if (block->getChildren().size() == 3 && _column <= 11 && a[_row - 1][_column + 1] == 0 && a[_row][_column + 1] == 0 && a[_row + 1][_column + 1] == 0)
+            {
+                _column += 1;
+                a[_row - 1][_column - 2] = 0;
+                a[_row][_column - 2] = 0;
+                a[_row + 1][_column - 2] = 0;
+                changeRightX(block);
+            }
+            if (block->getChildren().size() == 4 && _column <= indexR)
+                /*if ((a[_row - 1][_column + 1] == 1 && a[_row - 1][_column + 2] != 10
+                    && a[_row][_column + 1] == 1 && a[_row][_column + 2] != 10
+                    && a[_row + 1][_column + 1] == 1 && a[_row + 1][_column + 2] != 10)
+                    ||
+                    (
+                        a[_row - 1][_column + 1] == 1 && a[_row - 1][_column + 2] != 10
+                        && a[_row][_column + 1] == 1 && a[_row][_column + 2] != 10
+                        )
+                    ||
+                    (
+                        a[_row + 1][_column + 1] == 1 && a[_row + 1][_column + 2] != 10
+                        && a[_row][_column + 1] == 1 && a[_row][_column + 2] != 10
+                        )
+                    ||
+                    (
+                        a[_row][_column] == 1 && a[_row][_column + 1] != 10
+                        && a[_row - 1][_column + 1] == 1 && a[_row - 1][_column + 2] != 10
+                        )
+                    ||
+                    (
+                        a[_row][_column] == 1 && a[_row][_column + 1] != 10
+                        && a[_row + 1][_column + 1] == 1 && a[_row + 1][_column + 2] != 10
+                        )
+                    ||
+                    (a[_row - 1][_column + 1] == 0 && a[_row - 1][_column + 2] != 10
+                        && a[_row][_column + 1] == 0 && a[_row][_column + 2] != 10
+                        && a[_row + 1][_column + 1] == 0 && a[_row + 1][_column + 2] != 10)
+                    ||
+                    (
+                        a[_row - 1][_column + 1] == 0 && a[_row - 1][_column + 2] != 10
+                        && a[_row][_column + 1] == 0 && a[_row][_column + 2] != 10
+                        )
+                    ||
+                    (
+                        a[_row + 1][_column + 1] == 0 && a[_row + 1][_column + 2] != 10
+                        && a[_row][_column + 1] == 0 && a[_row][_column + 2] != 10
+                        )
+                    ||
+                    (
+                        a[_row][_column] == 0 && a[_row][_column + 1] != 10
+                        && a[_row - 1][_column + 1] == 0 && a[_row - 1][_column + 2] != 10
+                        )
+                    ||
+                    (
+                        a[_row][_column] == 0 && a[_row][_column + 1] != 10
+                        && a[_row + 1][_column + 1] == 0 && a[_row + 1][_column + 2] != 10
+                        )
+                    ||
+                    (a[_row][_column - 1] == 1 && a[_row][_column] == 1 && a[_row][_column + 1] == 1
+                        && a[_row][_column + 2] != 10
+                        )
+                    )*/
+                if ((a[_row][_column+2]!=10 &&a[_row][_column+1]== 0 
+                    && a[_row-1][_column+2]!=10 && a[_row-1][_column+1] == 0
+                    && a[_row+1][_column + 2] != 10 && a[_row+1][_column + 1] == 0
+                    )
+                    ||
+                    (
+                        a[_row][_column + 2] != 10 && a[_row][_column + 1] == 1
+                        && a[_row + 1][_column + 2] != 10 && a[_row + 1][_column + 1] == 1
+                        )
+                    || 
+                    (
+                        a[_row][_column + 2] != 10 && a[_row][_column + 1] == 1
+                        && a[_row - 1][_column + 2] != 10 && a[_row - 1][_column + 1] == 1
+                        )
+                    || 
+                    (   
+                        a[_row][_column+2]!=10 && a[_row][_column+1] == 1
+                        && a[_row+1][_column+2]!=10 && a[_row + 1][_column + 1] == 0
+                        )
+                    ||
+                    (
+                        a[_row+1][_column + 2] != 10 && a[_row+1][_column + 1] == 1
+                        && a[_row ][_column + 2] != 10 && a[_row ][_column + 1] == 0
+                        )
+                    )
+                {
+                    changeRightX(block);
+                    _column += 1;
+                    CCLOG("%d", _column);
+                    a[_row - 1][_column - 2] = 0;
+                    a[_row][_column - 2] = 0;
+                    a[_row + 1][_column - 2] = 0;
+                }
+        }});
+    auto downBtn = gameScene->getChildByName<ui::Button*>("btn_down");
+    downBtn->setPressedActionEnabled(true);
+    downBtn->addClickEventListener([=](Ref*) {
+                    block->stopAction(rSeq);
+                    block->runAction(RepeatForever::create(
+                        Sequence::create(
+                            MoveBy::create(0.00000001f, Point(0, -50)),
+                            CallFunc::create([=] {
+                                _row += 1;
+                                if (_row >= 2) checkArr(a, type_Block, _row, _column, _rolation);
+                                if (_row >= 3 && _row <= 13) {
+                                    if (a[_row - 2][_column] != 10)a[_row - 2][_column] = 0;
+                                    if (a[_row - 2][_column - 1] != 10)a[_row - 2][_column - 1] = 0;
+                                    if (a[_row - 2][_column + 1] != 10)a[_row - 2][_column + 1] = 0;
+                                }
+                                }),
+                            nullptr)));
     });
 }
 
+ui::Layout* GameScene::tetrisBorn(int typeBlock) {
+    switch (typeBlock)
+               {
+                case 1:
+                    type_Block = 1;
+                    return (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_o_0")->clone();
+                    break;
+                case 2:
+                    type_Block = 2;
+                    return (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_l_0")->clone();
+                    break;
+                case 3:
+                    type_Block = 3;
+                    return (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_j_0")->clone();
+                    break;
+                case 4:
+                    type_Block = 4;
+                    return (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_t_0")->clone();
+                    break;
+                case 5:
+                    type_Block = 5;
+                    return (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_z_0")->clone();
+                    break;
+                case 6:
+                    type_Block = 6;
+                    return (ui::Layout*)Imagesave->getChildByName<ui::Layout*>("block_i_0")->clone();
+                    break;
+                default:
+                    break;
+                }
+}
